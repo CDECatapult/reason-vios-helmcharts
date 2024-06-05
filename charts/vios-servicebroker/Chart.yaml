@@ -2,7 +2,7 @@ apiVersion: v2
 name: servicebroker
 appVersion: 0.2.14
 description: A generated Helm Chart for 5g-vios servicebroker
-version: 0.0.11
+version: 0.0.12
 type: application
 maintainers:
   - name: 5g-victori-project
@@ -10,6 +10,6 @@ maintainers:
 
 dependencies:
   - name: postgresql
-    version: '^15.5.1'
+    version: '^14.0.0'
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
