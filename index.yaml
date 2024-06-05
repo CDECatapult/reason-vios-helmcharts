@@ -3,6 +3,24 @@ entries:
   servicebroker:
   - apiVersion: v2
     appVersion: 0.2.14
+    created: "2024-06-05T10:14:38.599718488Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: ^12.1.14
+    description: A generated Helm Chart for 5g-vios servicebroker
+    digest: 12179071ba7442a4628815e7723598fb94fb310625acc36a8361e65452e61ab0
+    maintainers:
+    - name: 5g-victori-project
+      url: 5g-victori-project.github.io/vios-helmcharts
+    name: servicebroker
+    type: application
+    urls:
+    - https://github.com/CDECatapult/reason-vios-helmcharts/releases/download/servicebroker-0.0.9/servicebroker-0.0.9.tgz
+    version: 0.0.9
+  - apiVersion: v2
+    appVersion: 0.2.14
     created: "2024-06-05T09:44:05.420805313Z"
     dependencies:
     - condition: postgresql.enabled
@@ -37,4 +55,4 @@ entries:
     urls:
     - https://github.com/CDECatapult/reason-vios-helmcharts/releases/download/servicebroker-0.0.7/servicebroker-0.0.7.tgz
     version: 0.0.7
-generated: "2024-06-05T09:44:05.420815312Z"
+generated: "2024-06-05T10:14:38.599755266Z"
