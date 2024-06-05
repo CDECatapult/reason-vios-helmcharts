@@ -1,0 +1,15 @@
+apiVersion: v2
+name: edgeproxy
+description: A generated Helm Chart for 5g-vios edgeproxy
+type: application
+version: 0.0.6
+appVersion: 0.2.14
+maintainers:
+  - name: 5g-victori-project
+    url: 5g-victori-project.github.io/vios-helmcharts
+
+dependencies:
+  - name: postgresql
+    version: '^12.1.14'
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "connectivitymanager.fullname" . }}-config
+  labels:
+    {{- include "connectivitymanager.labels" . | nindent 4 }}
+data:
+  POSTGRES_SERVER: {{ include "connectivitymanager.postgresql.fullname" . }}
+  POSTGRES_DB: {{ .Values.postgresql.auth.database | quote }}
+  SMA_HOST: {{ .Values.config.smaHost | quote }}
+  SMA_PORT: {{ .Values.config.smaPort | quote }}
+  VYOS_SERVER: {{ .Values.config.vyosServer | quote }}
+  VYOS_Key: {{ .Values.config.vyosKey | quote }}
+  VYOS_ETHERNET_PORT: {{ .Values.config.vyosEthernetPort | quote }}
+  APIGATEWAY_HOST: {{ .Values.config.agaHost | quote }}
+  APIGATEWAY_PORT: {{ .Values.config.agaPort | quote }}
+  TUNNEL_SUBNET: {{ .Values.config.tunnelSubnet | quote }}
+  NetOS: {{ .Values.config.netOs | quote }}
+

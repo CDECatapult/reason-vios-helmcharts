@@ -1,0 +1,36 @@
+mongodb:
+  enabled: true
+  auth:
+    enabled: false
+    rootPassword: ""
+    username: viosuser
+    database: monitoring
+    password: viospassword
+
+config:
+  replicaCount: 1
+  appPort: 8000
+  type: NodePort
+  nodePort: 30020
+  dbPort: 27017
+  debug: "True"
+  logLevel: DEBUG
+  agaHost: apigateway
+  agaPort: 8000
+  systemEnv: KUBERNETES
+
+image:
+  repository: digicatapult/vios-monitoring
+  pullPolicy: Always
+  tag: 0.1.9
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""

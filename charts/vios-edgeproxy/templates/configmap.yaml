@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "edgeproxy.fullname" . }}-config
+  labels:
+    {{- include "edgeproxy.labels" . | nindent 4 }}
+data:
+  APP_DEBUG: {{ .Values.config.debug | quote }}
+  APP_LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  POSTGRES_SERVER: {{ include "edgeproxy.postgresql.fullname" . }}
+  POSTGRES_DB: {{ .Values.postgresql.auth.database | quote }}
+  VLAN_START: {{ .Values.config.vlanStart | quote }}
+  VLAN_END: {{ .Values.config.vlanEnd | quote }}
+  OPENSTACK_SERVER: {{ .Values.config.openstackServer | quote }}
+  OPENSTACK_USER: {{ .Values.config.openstackUser | quote }}
+  OPENSTACK_PASSWORD: {{ .Values.config.openstackPassword | quote }}
+  OPENSTACK_DOMAIN: {{ .Values.config.openstackDomain | quote }}
+  OPENSTACK_PROJECT: {{ .Values.config.openstackProject | quote }}
+  OPENSTACK_NETWORK_TYPE: {{ .Values.config.openstackNetworkType | quote }}
+  OPENSTACK_NETWORK_PROVIDER: {{ .Values.config.openstackNetworkProvider | quote }}
+  OPENSTACK_MGMT_NETWORK: {{ .Values.config.openstackMgmtNetwork | quote }}
+  OPENSTACK_UoB_DNS: {{ .Values.config.openstackUoBDns | quote }}
+  VYOS_SERVER: {{ .Values.config.vyosServer | quote }}
+  VYOS_ETHERNET_PORT: {{ .Values.config.vyosEthernetPort | quote }}
+  VYOS_INSTANCE_NAME: {{ .Values.config.vyosInstanceName | quote }}
+  VYOS_Key: {{ .Values.config.vyosKey | quote }}
+  OSM_VERSION: {{ .Values.config.osmVersion | quote }}
+  OSM_SERVER: {{ .Values.config.osmServer | quote }}
+  OSM_USERNAME: {{ .Values.config.osmUsername | quote }}
+  OSM_PASSWD: {{ .Values.config.osmPasswd | quote }}
+  OSM_PROJECT: {{ .Values.config.osmProject | quote }}
+  APIGATEWAY_HOST: {{ .Values.config.apigatewayHost | quote }}
+  APIGATEWAY_PORT: {{ .Values.config.apigatewayPort | quote }}
+  VIM_ACCOUNT: {{ .Values.config.vimAccount | quote }}
+  NETOS_ADDR: {{ .Values.config.netosAddr | quote }}
+  NETOS_CERT_PATH: {{ .Values.config.netosCertPath | quote }}
+  NETOS_USER: {{ .Values.config.netosUser | quote }}
+  NETOS_PASSWORD: {{ .Values.config.netosPassword | quote }}
+  APP_PORT: {{ .Values.config.appPort | quote }}
+  APP_ENDPOINT: {{ .Values.config.appEndpoint | quote }}
+  EPA_Server_IP: {{ .Values.config.epaServerIp | quote }}
+  DNS_SERVER_IP: {{ .Values.config.dnsServerIp | quote }}
+  DNS_SERVER_PORT: {{ .Values.config.dnsServerPort | quote }}
+  I2SM_IP: {{ .Values.config.i2SmIp | quote }}
+  I2SM_PORT: {{ .Values.config.i2SmPort | quote }}
+
+
+

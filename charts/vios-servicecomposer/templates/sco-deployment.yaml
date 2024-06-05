@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "servicecomposer.fullname" . }}-app
+  labels:
+    {{- include "servicecomposer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.config.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ include "servicecomposer.fullname" . }}-app
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/sco-configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/sco-secrets.yaml") . | sha256sum }}
+      labels:
+        name: {{ include "servicecomposer.fullname" . }}-app
+    spec:
+      {{- include "servicecomposer.imagePullSecrets" . | indent 6 }}
+      initContainers:
+        - name: {{ include "servicecomposer.fullname" . }}-init
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command: ['python', 'manage.py', 'makemigrations']
+          envFrom:
+          - configMapRef:
+              name: {{ include "servicecomposer.fullname" . }}-config
+          - secretRef:
+              name: {{ include "servicecomposer.fullname" . }}-secret
+      containers:
+        - name: {{ include "servicecomposer.fullname" . }}-app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.config.appPort }}
+          readinessProbe:
+            httpGet:
+              path: /watchman/ping/
+              port: {{ .Values.config.appPort }}
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /watchman/ping/
+              port: {{ .Values.config.appPort }}
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 15
+          envFrom:
+          - configMapRef:
+              name: {{ include "servicecomposer.fullname" . }}-config
+          - secretRef:
+              name: {{ include "servicecomposer.fullname" . }}-secret
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP

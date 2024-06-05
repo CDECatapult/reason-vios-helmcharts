@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "portal.fullname" . }}-app
+  labels:
+    {{- include "portal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.config.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ include "portal.fullname" . }}-app
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/portal-configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/portal-secrets.yaml") . | sha256sum }}
+      labels:
+        name: {{ include "portal.fullname" . }}-app
+    spec:
+      initContainers:
+        - name: {{ include "portal.fullname" . }}-init
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command: ['python', 'manage.py', 'migrations']
+          envFrom:
+          - configMapRef:
+              name: {{ include "portal.fullname" . }}-config
+          - secretRef:
+              name: {{ include "portal.fullname" . }}-secret
+      containers:
+        - name: {{ include "portal.fullname" . }}-app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command: {{ .Values.image.command }}
+          args: ["while true; do sleep 30; done;"]
+          ports:
+             - containerPort: {{ .Values.config.appPort }}
+          #livenessProbe:
+          #  httpGet:
+          #    path: {{ .Values.config.livenessPath }}
+          #    port: {{ .Values.config.appPort }}
+          #readinessProbe:
+          #  httpGet:
+          #    path: {{ .Values.config.readinessPath }}
+          #    port: {{ .Values.config.appPort }}
+          #  failureThreshold: {{ .Values.config.readinessFailureThreshold }}
+          #  periodSeconds: {{ .Values.config.readinessPeriodSeconds }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "portal.fullname" . }}-config
+          - secretRef:
+              name: {{ include "portal.fullname" . }}-secret
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP 
+      {{- include "portal.imagePullSecrets" . | indent 6 }}
+      restartPolicy: Always

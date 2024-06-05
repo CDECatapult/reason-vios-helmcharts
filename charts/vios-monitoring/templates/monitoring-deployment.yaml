@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monitoring.fullname" . }}-app
+  labels:
+    {{- include "monitoring.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.config.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ include "monitoring.fullname" . }}-app
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/monitoring-configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/monitoring-secrets.yaml") . | sha256sum }}
+      labels:
+        name: {{ include "monitoring.fullname" . }}-app
+    spec:
+      {{- include "monitoring.imagePullSecrets" . | indent 6 }}
+      containers:
+        - name: {{ include "monitoring.fullname" . }}-app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.config.appPort }}
+          # readinessProbe:
+          #   httpGet:
+          #     path: /api/monitoring/healthcheck
+          #     port: {{ .Values.config.appPort }}
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 15
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/monitoring/healthcheck
+          #     port: {{ .Values.config.appPort }}
+          #   initialDelaySeconds: 15
+          #   timeoutSeconds: 15
+          #   periodSeconds: 15
+          envFrom:
+          - configMapRef:
+              name: {{ include "monitoring.fullname" . }}-config
+          - secretRef:
+              name: {{ include "monitoring.fullname" . }}-secret
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP

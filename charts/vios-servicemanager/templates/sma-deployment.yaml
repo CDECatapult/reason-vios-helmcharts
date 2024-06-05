@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "servicemanager.fullname" . }}-app
+  labels:
+    {{- include "servicemanager.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.config.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ include "servicemanager.fullname" . }}-app
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/sma-configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/sma-secrets.yaml") . | sha256sum }}
+      labels:
+        name: {{ include "servicemanager.fullname" . }}-app
+    spec:
+      {{- include "servicemanager.imagePullSecrets" . | indent 6 }}
+      initContainers:
+        - name: {{ include "servicemanager.fullname" . }}-init
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command: ['sleep', '60']
+      containers:
+        - name: {{ include "servicemanager.fullname" . }}-app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.config.appPort }}
+          livenessProbe:
+            httpGet:
+              path: /api/sma/healthchecks/readiness
+              port: {{ .Values.config.appPort }}
+            initialDelaySeconds: 15
+            timeoutSeconds: 15
+            periodSeconds: 15
+          envFrom:
+          - configMapRef:
+              name: {{ include "servicemanager.fullname" . }}-config
+          - secretRef:
+              name: {{ include "servicemanager.fullname" . }}-secret
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
